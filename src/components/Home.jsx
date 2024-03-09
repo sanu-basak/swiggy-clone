@@ -1,16 +1,14 @@
 import RestaurantCard from "./RestaurantCard";
-import {useState,useEffect} from 'react'
+import {useEffect, useState} from 'react'
+import useRestaurantList from "../utils/useRestaurantList"
+import { Link } from "react-router-dom";
+import Shimmer from "./Shimmer";
 
 const Home = () => {
-    const fetchData = async () => {
-        let resData = await fetch("https://www.swiggy.com/dapi/restaurants/list/v5?page_type=DESKTOP_WEB_LISTING&lat=19.1174798&lng=72.86916029999999")
-        const json = await resData.json()
-        setResList(json?.data?.cards[4]?.card?.card?.gridElements?.infoWithStyle?.restaurants)
-    }
 
-   
+    const [resList,setResList] = useState([])
+    const resData = useRestaurantList()
 
-    const [resList,setResList] = useState([]);
     const filteredRes = () => {
         let filterList = resList.filter((res) => {
             return res.info.avgRating >= 4
@@ -18,14 +16,11 @@ const Home = () => {
         setResList(filterList)
     }
 
-    useEffect(() => {
-        fetchData()
-    },[])
-
-    if(resList.length === 0 ){
-        return <h1>Loading</h1>
-    }
-    return (
+    useEffect(() =>{
+        setResList(resData?.data?.cards[4]?.card?.card?.gridElements?.infoWithStyle?.restaurants)
+    },[resData])
+    
+    return (resList === undefined || resList === null || resList.length === 0 ) ?  <Shimmer/> :  (
         <>
             <div className="home">
                 <div className="flex">
@@ -41,9 +36,11 @@ const Home = () => {
                 <div className="flex flex-wrap">
                     { 
                         resList.map((res) => { 
-                            return <RestaurantCard key={res.id}
+                            return <Link to={"/restaurant/"+res.info.id}>
+                                <RestaurantCard key={res.info.id}
                                   resData = {res}
-                        /> })
+                                />
+                            </Link> })
                     }
                 </div>                
             </div>
