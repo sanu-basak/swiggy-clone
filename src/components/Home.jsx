@@ -35,7 +35,7 @@ const Home = () => {
                 </div>
                 <div className="flex flex-wrap">
                     { 
-                        resList.map((res) => { 
+                        resList.map((res) => { console.log(res)
                             return <Link to={"/restaurant/"+res.info.id}>
                                 <RestaurantCard key={res.info.id}
                                   resData = {res}
